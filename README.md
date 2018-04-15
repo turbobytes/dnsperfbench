@@ -1,6 +1,27 @@
 # dnsperfbench
 DNS Performance Benchmarker
 
+dnsperfbench compares the performance of popular public DNS resolvers from your computer. It for each resolver it tests cache hit (basically round trip latency), and cache miss against various authoritative managed DNS providers. Each test is repeated 15 times. Once the tests are finished, it presents a summary.
+
+For example
+
+```
+========== Summary ===========
+Scores (lower is better)
++--------------------------------+-------------------+
+|            RESOLVER            | PERFORMANCE SCORE |
++--------------------------------+-------------------+
+| 1.1.1.1 (Cloudflare)           |              1983 |
+| 208.67.222.222 (OpenDNS)       |              3175 |
+| 199.85.126.20 (Norton)         |              3846 |
+| 8.8.8.8 (Google)               |              6275 |
+| 185.228.168.168 (Clean         |             12825 |
+| Browsing)                      |                   |
+| 9.9.9.9 (Quad9)                |             14677 |
+| 8.26.56.26 (Comodo)            |            200494 |
++--------------------------------+-------------------+
+You should probably use 1.1.1.1 as your default resolver
+```
 
 ## Installation
 
@@ -33,8 +54,8 @@ Assume the latest tag is `v0.1.1`
 
 ```
 #One-off test
-curl -Lo /tmp/dnsbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-linux && chmod +x /tmp/dnsbench && dnsbench #Linux
-curl -Lo /tmp/dnsbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-osx && chmod +x /tmp/dnsbench && dnsbench #OSX
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-linux && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #Linux
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
 ```
 
 To have it permanently available store the binary somewhere permanent

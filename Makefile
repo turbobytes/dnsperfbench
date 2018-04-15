@@ -4,7 +4,7 @@ LDFLAGS='-X main.versionString=${VERSION} -X "main.goVersionString=${GOVERSION}"
 
 docker:
 	mkdir -p bin/
-	CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -o bin/dnsperfbench main.go
+	CGO_ENABLED=0 go build -ldflags ${LDFLAGS} -o bin/dnsperfbench main.go
 	docker build -t turbobytes/dnsperfbench .
 	docker push turbobytes/dnsperfbench
 

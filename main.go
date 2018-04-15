@@ -31,6 +31,7 @@ var resolvers arrayFlags
 
 var (
 	raw              = flag.Bool("r", false, "Output raw mode")
+	version          = flag.Bool("version", false, "Print version and exit")
 	defaultResolvers = []string{"8.8.8.8", "1.1.1.1", "9.9.9.9", "208.67.222.222", "199.85.126.20", "185.228.168.168", "8.26.56.26"}
 	resolverNames    = map[string]string{
 		"8.8.8.8":         "Google",
@@ -62,8 +63,10 @@ var (
 		"Ultradns":    "tbrum22.com.",
 		"Azure":       "tbrum25.com.",
 	}
-	authSl    []string
-	ratelimit = make(chan struct{}, 5) //Max number of dns queries in flight at a time
+	authSl          []string
+	ratelimit       = make(chan struct{}, 5) //Max number of dns queries in flight at a time
+	versionString   = "dirty"
+	goVersionString = "unknown"
 )
 
 const (
@@ -93,7 +96,11 @@ func init() {
 		authSl = append(authSl, auth)
 	}
 	sort.Strings(authSl)
-
+	if *version {
+		fmt.Println(versionString)
+		fmt.Println(goVersionString)
+		os.Exit(0)
+	}
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")

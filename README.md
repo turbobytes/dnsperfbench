@@ -86,6 +86,6 @@ To have it permanently available store the binary somewhere permanent
 
 Arguments
 
-- `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided servers against public resolvers.
+- `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided servers against public resolvers. IPv6 goes in [square brackets]
 - `-r` Print the output in a machine readable format
 - `-version` Print the version and exit

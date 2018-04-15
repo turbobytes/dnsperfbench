@@ -113,7 +113,7 @@ func randStringRunes(n int) string {
 	return string(b)
 }
 
-func testresolver(hostname, resolver string) *time.Duration {
+func testresolver(hostname, resolver string) (*time.Duration, error) {
 	//Add to ratelimit, block until a slot is available
 	ratelimit <- struct{}{}
 	//Remove from rate limit when done
@@ -128,23 +128,23 @@ func testresolver(hostname, resolver string) *time.Duration {
 	defer cancel()
 	in, rtt, err := c.ExchangeContext(ctx, m, resolver+":53")
 	if err != nil {
-		return nil
+		return &failDuration, err
 	}
 	//Validate response
 	//Expect only one answer
 	if len(in.Answer) != 1 {
-		return nil
+		return &failDuration, fmt.Errorf("Number of answers is not 1")
 	}
 	arec, ok := in.Answer[0].(*dns.A)
 	if !ok {
-		return nil
+		return &failDuration, fmt.Errorf("Answer is not type A")
 	}
 	_, ok = expectedanswers[arec.A.String()]
 	if !ok {
-		return nil
+		return &failDuration, fmt.Errorf("Got strange answer. Evil hijacking resolver?")
 	}
 	//rtt = rtt.Truncate(time.Millisecond / 4)
-	return &rtt
+	return &rtt, nil
 }
 
 func runtests(host, res string, rndSuffix bool) resolverResults {
@@ -156,11 +156,10 @@ func runtests(host, res string, rndSuffix bool) resolverResults {
 		if rndSuffix {
 			hostname = randStringRunes(15) + "." + host
 		}
-		rtt := testresolver(hostname, res)
-		if rtt == nil {
+		rtt, err := testresolver(hostname, res)
+		vals = append(vals, *rtt)
+		if err != nil {
 			fails++
-		} else {
-			vals = append(vals, *rtt)
 		}
 	}
 	//Print summary
@@ -224,10 +223,10 @@ func (res recursiveResults) Print(resolver, name string) {
 
 func (res recursiveResults) Score() float64 {
 	result := res["ResolverHit"]
-	score := 5 * (float64(result.mean/time.Millisecond) + float64(result.median/time.Millisecond) + result.failratio*testrep*float64(failDuration/time.Millisecond))
+	score := 5 * (float64(result.mean/time.Millisecond) + float64(result.median/time.Millisecond))
 	for _, auth := range authSl {
 		result := res[auth]
-		score += float64(result.mean/time.Millisecond) + float64(result.median/time.Millisecond) + result.failratio*testrep*float64(failDuration/time.Millisecond)
+		score += float64(result.mean/time.Millisecond) + float64(result.median/time.Millisecond)
 	}
 	return score
 }

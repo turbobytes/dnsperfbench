@@ -72,12 +72,12 @@ docker run --rm -it turbobytes/dnsperfbench dnsperfbench
 
 Visit the age for the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
 
-Assume the latest tag is `v0.1.1`
+Assume the latest tag is `v0.1.2`
 
 ```
 #One-off test
-curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-linux && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #Linux
-curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.1/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.2/dnsperfbench-linux && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #Linux
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.2/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
 ```
 
 To have it permanently available store the binary somewhere permanent

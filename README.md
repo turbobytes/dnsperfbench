@@ -1,9 +1,17 @@
 # dnsperfbench
 DNS Performance Benchmarker
 
-dnsperfbench compares the performance of popular public DNS resolvers from your computer. It for each resolver it tests cache hit (basically round trip latency), and cache miss against various authoritative managed DNS providers. Each test is repeated 15 times. Once the tests are finished, it presents a summary.
+dnsperfbench is a command line tool to compare performance of popular public DNS resolvers from your computer, including Google Public DNS, OpenDNS and Cloudflare's 1.1.1.1.
 
-For example with one of my ISPs
+You may optionally specify IP addresses of additional resolvers to include in the benchmark, for example the IP address of your ISP's resolver.
+
+For each resolver, dnsperfbench first runs runs a few tests for a specific FQDN, to ensure the resolver has the response in cache. 
+Next, dnsperfbench tests cache hit performance (basically round trip latency; we call this ResolverHit) and cache miss performance against various major authoritative DNS providers.
+Each test is repeated 15 times. 
+
+Once all the tests have finished, dnsperfbench shows the results per resolver (median and mean RTT and % tests that failed) and computes an overall performance score per resolver. The lower the score, the better was the resolver's performance.
+
+Example of the overall Summary:
 
 ```
 ========== Summary ===========
@@ -23,7 +31,7 @@ Scores (lower is better)
 You should probably use 1.1.1.1 as your default resolver
 ```
 
-and from another ISP at same location
+... and the Summary of running dnsperfbench at the same location but from another ISP:
 
 ```
 ========== Summary ===========
@@ -43,7 +51,11 @@ Scores (lower is better)
 You should probably use 1.1.1.1 as your default resolver
 ```
 
-While Cloudflare happened to be the fastest in both cases, the performance of OpenDNS was different between ISPs.
+While Cloudflare happened to be the best in both cases, performance of OpenDNS was quite different.
+
+The performance score is calculated using the following formula: 
+`5 * (ResolverHit mean + ResolverHit median) + ( for each auth: (auth mean + auth median) )`
+A failed test is treated as the test taking 10 seconds.
 
 ## Installation
 
@@ -70,7 +82,7 @@ docker run --rm -it turbobytes/dnsperfbench dnsperfbench
 
 ### Download a release
 
-Visit the age for the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
+Visit the age of the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
 
 Assume the latest tag is `v0.1.2`
 
@@ -80,12 +92,12 @@ curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/d
 curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.2/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
 ```
 
-To have it permanently available store the binary somewhere permanent
+To have it permanently available store the binary somewhere permanent.
 
 ## Usage
 
 Arguments
 
-- `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided servers against public resolvers. IPv6 goes in [square brackets]
+- `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided resolver against public resolvers. IPv6 goes in [square brackets]
 - `-r` Print the output in a machine readable format
 - `-version` Print the version and exit

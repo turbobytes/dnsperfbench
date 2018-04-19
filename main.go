@@ -210,6 +210,7 @@ func (res recursiveResults) Print(resolver, name string) {
 	} else {
 		fmt.Printf("========== %s (%s) ===========\n", resolver, name)
 		table := tablewriter.NewWriter(os.Stdout)
+		table.SetAutoWrapText(false)
 		table.SetHeader([]string{"Auth", "Mean", "Median", "Fail"})
 		result := res["ResolverHit"]
 		table.Append([]string{"ResolverHit", result.mean.Round(time.Millisecond).String(), result.median.Round(time.Millisecond).String(), fmt.Sprintf("%.2f%%", result.failratio*100)})
@@ -294,6 +295,7 @@ func main() {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAutoWrapText(false)
 	table.SetHeader([]string{"Resolver", "Performance Score"})
 
 	for _, sum := range summary {

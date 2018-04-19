@@ -5,9 +5,9 @@ dnsperfbench is a command line tool to compare performance of popular public DNS
 
 You may optionally specify IP addresses of additional resolvers to include in the benchmark, for example the IP address of your ISP's resolver.
 
-For each resolver, dnsperfbench first runs runs a few tests for a specific FQDN, to ensure the resolver has the response in cache. 
+For each resolver, dnsperfbench first runs runs a few tests for a specific FQDN, to ensure the resolver has the response in cache.
 Next, dnsperfbench tests cache hit performance (basically round trip latency; we call this ResolverHit) and cache miss performance against various major authoritative DNS providers.
-Each test is repeated 15 times. 
+Each test is repeated 15 times.
 
 Once all the tests have finished, dnsperfbench shows the results per resolver (median and mean RTT and % tests that failed) and computes an overall performance score per resolver. The lower the score, the better was the resolver's performance.
 
@@ -53,7 +53,7 @@ You should probably use 1.1.1.1 as your default resolver
 
 While Cloudflare happened to be the best in both cases, performance of OpenDNS was quite different.
 
-The performance score is calculated using the following formula: 
+The performance score is calculated using the following formula:
 `5 * (ResolverHit mean + ResolverHit median) + ( for each auth: (auth mean + auth median) )`
 A failed test is treated as the test taking 10 seconds.
 
@@ -84,7 +84,7 @@ docker run --rm -it turbobytes/dnsperfbench dnsperfbench
 
 View the page of the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
 
-Assume the latest tag is `v0.1.2`
+Assume the latest tag is `v0.1.3`
 
 ```
 #One-off test

@@ -1,4 +1,4 @@
-VERSION=v0.1.2
+VERSION=v0.1.3
 GOVERSION=$(shell go version)
 LDFLAGS='-X main.versionString=${VERSION} -X "main.goVersionString=${GOVERSION}"'
 

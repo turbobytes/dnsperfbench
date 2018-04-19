@@ -82,7 +82,7 @@ docker run --rm -it turbobytes/dnsperfbench dnsperfbench
 
 ### Download a release
 
-View the age of the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
+View the page of the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
 
 Assume the latest tag is `v0.1.2`
 

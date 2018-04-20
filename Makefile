@@ -3,8 +3,6 @@ GOVERSION=$(shell go version)
 LDFLAGS='-X main.versionString=${VERSION} -X "main.goVersionString=${GOVERSION}"'
 
 docker:
-	mkdir -p bin/
-	CGO_ENABLED=0 go build -ldflags ${LDFLAGS} -o bin/dnsperfbench main.go
 	docker build -t turbobytes/dnsperfbench .
 	docker tag turbobytes/dnsperfbench turbobytes/dnsperfbench:$(VERSION)
 	docker push turbobytes/dnsperfbench:latest

@@ -32,15 +32,20 @@ var resolvers arrayFlags
 var (
 	raw              = flag.Bool("r", false, "Output raw mode")
 	version          = flag.Bool("version", false, "Print version and exit")
-	defaultResolvers = []string{"8.8.8.8", "1.1.1.1", "9.9.9.9", "208.67.222.222", "199.85.126.20", "185.228.168.168", "8.26.56.26"}
+	defaultResolvers = []string{}
 	resolverNames    = map[string]string{
-		"8.8.8.8":         "Google",
-		"1.1.1.1":         "Cloudflare",
-		"9.9.9.9":         "Quad9",
-		"208.67.222.222":  "OpenDNS",
-		"199.85.126.20":   "Norton",
-		"185.228.168.168": "Clean Browsing",
-		"8.26.56.26":      "Comodo",
+		"8.8.8.8":                "Google",
+		"1.1.1.1":                "Cloudflare",
+		"9.9.9.9":                "Quad9",
+		"208.67.222.222":         "OpenDNS",
+		"199.85.126.20":          "Norton",
+		"185.228.168.168":        "Clean Browsing",
+		"8.26.56.26":             "Comodo",
+		"[2001:4860:4860::8888]": "Google",
+		"[2606:4700:4700::1111]": "Cloudflare",
+		"[2620:fe::fe]":          "Quad9",
+		"[2620:0:ccc::2]":        "OpenDNS", //https://www.opendns.com/about/innovations/ipv6/
+		"[2a0d:2a00:1::]":        "Clean Browsing",
 	}
 	//All answers must match these
 	expectedanswers = map[string]struct{}{
@@ -83,6 +88,9 @@ func appendIfMissing(src []string, new string) []string {
 }
 
 func init() {
+	for k := range resolverNames {
+		defaultResolvers = append(defaultResolvers, k)
+	}
 	var tmp arrayFlags
 	flag.Var(&tmp, "resolver", "Additional resolvers to test. default="+strings.Join(defaultResolvers, ", "))
 	flag.Parse()

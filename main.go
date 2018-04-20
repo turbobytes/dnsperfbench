@@ -70,10 +70,10 @@ var (
 		"Azure":       "tbrum25.com.",
 	}
 	authSl          []string
-	ratelimit       = make(chan struct{}, 5) //Max number of dns queries in flight at a time
 	versionString   = "dirty"
 	goVersionString = "unknown"
-	workerLimit *semaphore.Weighted
+	workerLimit     *semaphore.Weighted
+	queryLimit      *semaphore.Weighted
 )
 
 const (
@@ -96,8 +96,10 @@ func init() {
 	var tmp arrayFlags
 	flag.Var(&tmp, "resolver", "Additional resolvers to test. default="+strings.Join(defaultResolvers, ", "))
 	maxWorkers := flag.Int("workers", len(defaultResolvers), "Number of tests to run at once")
+	maxQueries := flag.Int("queries", 5, "Limit the number of DNS queries in-flight at a time")
 	flag.Parse()
 	workerLimit = semaphore.NewWeighted(int64(*maxWorkers))
+	queryLimit = semaphore.NewWeighted(int64(*maxQueries))
 	resolvers = defaultResolvers
 	for _, res := range tmp {
 		resolvers = appendIfMissing(resolvers, res)
@@ -125,11 +127,14 @@ func randStringRunes(n int) string {
 	return string(b)
 }
 
-func testresolver(hostname, resolver string, ) (*time.Duration, error) {
+func testresolver(hostname, resolver string) (*time.Duration, error) {
 	//Add to ratelimit, block until a slot is available
-	ratelimit <- struct{}{}
+	if err := queryLimit.Acquire(context.TODO(), 1); err != nil {
+		log.Fatal("Failed ta acquire semaphore", err)
+		return nil, err
+	}
 	//Remove from rate limit when done
-	defer func() { <-ratelimit }()
+	defer queryLimit.Release(1)
 	m := new(dns.Msg)
 	m.Id = dns.Id()
 	m.RecursionDesired = true

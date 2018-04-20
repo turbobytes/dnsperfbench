@@ -102,10 +102,16 @@ To have it permanently available store the binary somewhere permanent.
 
 ## Usage
 
-Arguments
-
-- `-queries` Limit the number of DNS queries in-flight at a time
-- `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided resolver against public resolvers. IPv6 goes in [square brackets]
-- `-r` Print the output in a machine readable format
-- `-workers` Limit the number of resolvers that are tested at a time
-- `-version` Print the version and exit
+```
+$ dnsperfbench --help
+Usage of dnsperfbench:
+  -queries int
+        Limit the number of DNS queries in-flight at a time (default 5)
+  -r    Output raw mode
+  -resolver value
+        Additional resolvers to test. default=8.8.8.8, 1.1.1.1, 185.228.168.168, 8.26.56.26, [2001:4860:4860::8888], [2620:0:ccc::2], [2a0d:2a00:1::], 9.9.9.9, 208.67.222.222, 199.85.126.20, [2606:4700:4700::1111], [2620:fe::fe]
+  -version
+        Print version and exit
+  -workers int
+        Number of tests to run at once (default 12)
+```

@@ -77,7 +77,13 @@ Binary will be located at `$GOPATH/bin/dnsperfbench`
 ```
 docker pull turbobytes/dnsperfbench
 #Run using
-docker run --rm -it turbobytes/dnsperfbench dnsperfbench
+docker run --rm -it turbobytes/dnsperfbench
+```
+
+You can also set flags with the Docker image:
+
+```
+docker run --rm -it turbobytes/dnsperfbench -workers 2
 ```
 
 ### Download a release
@@ -100,4 +106,5 @@ Arguments
 
 - `-resolver IP` Specify multiple times to test additional resolvers. Might be useful for comparing your ISP provided resolver against public resolvers. IPv6 goes in [square brackets]
 - `-r` Print the output in a machine readable format
+- `-workers` Limit the number of resolvers that are tested at a time
 - `-version` Print the version and exit

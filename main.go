@@ -14,6 +14,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/montanaflynn/stats"
 	"github.com/olekukonko/tablewriter"
+	"golang.org/x/sync/semaphore"
 )
 
 type arrayFlags []string
@@ -72,6 +73,7 @@ var (
 	ratelimit       = make(chan struct{}, 5) //Max number of dns queries in flight at a time
 	versionString   = "dirty"
 	goVersionString = "unknown"
+	workerLimit *semaphore.Weighted
 )
 
 const (
@@ -93,7 +95,9 @@ func init() {
 	}
 	var tmp arrayFlags
 	flag.Var(&tmp, "resolver", "Additional resolvers to test. default="+strings.Join(defaultResolvers, ", "))
+	maxWorkers := flag.Int("workers", len(defaultResolvers), "Number of tests to run at once")
 	flag.Parse()
+	workerLimit = semaphore.NewWeighted(int64(*maxWorkers))
 	resolvers = defaultResolvers
 	for _, res := range tmp {
 		resolvers = appendIfMissing(resolvers, res)
@@ -121,7 +125,7 @@ func randStringRunes(n int) string {
 	return string(b)
 }
 
-func testresolver(hostname, resolver string) (*time.Duration, error) {
+func testresolver(hostname, resolver string, ) (*time.Duration, error) {
 	//Add to ratelimit, block until a slot is available
 	ratelimit <- struct{}{}
 	//Remove from rate limit when done
@@ -266,17 +270,25 @@ func main() {
 	resscore := make(map[string]float64)
 	results := make(map[string]recursiveResults)
 	resultschan := make(chan resultoutput, 1)
+
+	// Respect worker limit.
+	ctx := context.TODO()
+
 	//Fire off tests
 	for _, res := range resolvers {
 		//Stagger the start of tests
 		time.Sleep(time.Millisecond * 50)
-		log.Println("Issuing tests for ", res)
 		go func(recursive string) {
+			if err := workerLimit.Acquire(ctx, 1); err != nil {
+				log.Fatal("Failed ta acquire semaphore", err)
+				return
+			}
+			log.Println("Issuing tests for ", recursive)
+			defer workerLimit.Release(1)
 			resultschan <- resultoutput{recursive: recursive, result: testrecursive(recursive)}
 		}(res)
 	}
 	//Gather results
-	log.Println("Waiting to gather results ")
 	for i := range resolvers {
 		result := <-resultschan
 		log.Printf("[%v/%v] Got results for %s\n", i+1, len(resolvers), result.recursive)

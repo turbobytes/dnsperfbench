@@ -90,12 +90,12 @@ docker run --rm -it turbobytes/dnsperfbench -workers 2
 
 View the page of the [latest release](https://github.com/turbobytes/dnsperfbench/releases/latest). Then copy download link from there.
 
-Assume the latest tag is `v0.1.5`
+Assume the latest tag is `v0.1.6`
 
 ```
 #One-off test
-curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.5/dnsperfbench-linux && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #Linux
-curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.5/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.6/dnsperfbench-linux && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #Linux
+curl -Lo /tmp/dnsperfbench https://github.com/turbobytes/dnsperfbench/releases/download/v0.1.6/dnsperfbench-osx && chmod +x /tmp/dnsperfbench && /tmp/dnsperfbench #OSX
 ```
 
 To have it permanently available store the binary somewhere permanent.
@@ -106,12 +106,12 @@ To have it permanently available store the binary somewhere permanent.
 $ dnsperfbench --help
 Usage of dnsperfbench:
   -queries int
-        Limit the number of DNS queries in-flight at a time (default 5)
-  -r    Output raw mode
+    	Limit the number of DNS queries in-flight at a time (default 5)
+  -r	Output raw mode
   -resolver value
-        Additional resolvers to test. default=8.8.8.8, 1.1.1.1, 185.228.168.168, 8.26.56.26, [2001:4860:4860::8888], [2620:0:ccc::2], [2a0d:2a00:1::], 9.9.9.9, 208.67.222.222, 199.85.126.20, [2606:4700:4700::1111], [2620:fe::fe]
+    	Additional resolvers to test. default=8.8.8.8, 114.114.114.114, 180.76.76.76, 8.26.56.26, 208.67.222.222, [2001:4860:4860::8888], [2620:0:ccc::2], 1.1.1.1, 119.29.29.29, 185.228.168.168, [2606:4700:4700::1111], [2620:fe::fe], 9.9.9.9, 199.85.126.20, [2a0d:2a00:1::]
   -version
-        Print version and exit
+    	Print version and exit
   -workers int
-        Number of tests to run at once (default 12)
+    	Number of tests to run at once (default 15)
 ```

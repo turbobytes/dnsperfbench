@@ -13,5 +13,6 @@ RUN CGO_ENABLED=0 go install -ldflags '-extldflags "-static"' github.com/turboby
 FROM scratch
 
 COPY --from=0 /go/bin/dnsperfbench /bin/dnsperfbench
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 ENTRYPOINT [ "/bin/dnsperfbench" ]

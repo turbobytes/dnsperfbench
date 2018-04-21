@@ -64,7 +64,7 @@ New functionality `-httptest` benchmarks the performance of a given http(s) endp
 Example
 
 ```
-dnsperfbench -resolver 115.178.58.10 -httptest https://turbobytes.akamaized.net/static/rum/100kb-image.jpg
+$ dnsperfbench -resolver 115.178.58.10 -httptest https://turbobytes.akamaized.net/static/rum/100kb-image.jpg
 2018/04/21 20:09:47 Resolving
 2018/04/21 20:10:00 Issuing HTTP(s) tests
 +-------------------------------------+--------------------+---------+-------+-------+----------+--------+

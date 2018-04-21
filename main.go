@@ -35,7 +35,7 @@ var resolvers arrayFlags
 var (
 	raw              = flag.Bool("r", false, "Output raw mode")
 	version          = flag.Bool("version", false, "Print version and exit")
-	httptest         = flag.String("httptest", "", "Set this to a URL to test HTTP/HTTPS")
+	httptest         = flag.String("httptest", "", "Specify a URL to test including protocol (http or https)")
 	defaultResolvers = []string{}
 	resolverNames    = map[string]string{
 		"8.8.8.8":                "Google",

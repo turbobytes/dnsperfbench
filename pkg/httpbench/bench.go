@@ -65,7 +65,7 @@ func TestOverHTTP(u *url.URL, resolvers []string) Results {
 			//log.Println(ip, ci, err)
 			if err != nil {
 				//ipresall[ip] = append(ipresall[ip], nil)
-				log.Println(err)
+				log.Printf("%v, Using IP: %v, Reported by %v\n", err, ip, allipmap[ip])
 				results[i] = nil
 			} else {
 				results[i] = ci

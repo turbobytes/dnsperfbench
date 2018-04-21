@@ -6,15 +6,6 @@ import (
 	"sort"
 )
 
-func appendIfMissing(src []string, new string) []string {
-	for _, ele := range src {
-		if ele == new {
-			return src
-		}
-	}
-	return append(src, new)
-}
-
 //Result of individual server
 type Result struct {
 	Server string
@@ -30,59 +21,28 @@ func (a Results) Less(i, j int) bool { return a[i].CI.Total < a[j].CI.Total }
 
 //TestOverHTTP tests a url over HTTP after resolving against various resolvers
 func TestOverHTTP(u *url.URL, resolvers []string) Results {
-	ipmap := make(map[string]string)
-	allipmap := make(map[string][]string)
-	log.Println("Resolving")
-	for _, server := range resolvers {
-		ips := resolve(u.Hostname(), server)
-		//Map popularity of each ip
-		for _, ip := range ips {
-			allipmap[ip] = append(allipmap[ip], server)
-		}
-	}
-	//Popularity contest
-	for i := len(resolvers); i != 0; i-- {
-		for ip, servers := range allipmap {
-			if len(servers) == i {
-				for _, server := range servers {
-					if ipmap[server] == "" {
-						ipmap[server] = ip
-					}
-				}
-			}
-		}
-	}
-	iplist := make([]string, 0)
-	for _, v := range ipmap {
-		iplist = appendIfMissing(iplist, v)
-	}
-	ipres := make(map[string]*ConInfo)
-	log.Println("Issuing HTTP(s) tests")
-	for _, ip := range iplist {
-		results := make([]*ConInfo, 10)
+	var finalresult Results = make([]Result, 0)
+	for _, resolver := range resolvers {
+		results := make([]*ConInfo, 0)
+		//Issue 10 tests
 		for i := 0; i < 10; i++ {
-			ci, err := testoverhttp(u, ip)
+			ci, err := testoverhttp(u, resolver)
 			//log.Println(ip, ci, err)
 			if err != nil {
 				//ipresall[ip] = append(ipresall[ip], nil)
-				log.Printf("%v, Using IP: %v, Reported by %v\n", err, ip, allipmap[ip])
-				results[i] = nil
+				log.Printf("%v, Using Resolver: %v\n", err, resolver)
 			} else {
-				results[i] = ci
+				results = append(results, ci)
 				//ipresall[ip] = append(ipresall[ip], ci)
 			}
 		}
-		ipres[ip] = medianconinfo(results)
-	}
-	//Compute "median" run per ip
-	var finalresult Results = make([]Result, 0)
-	for server, ip := range ipmap {
-		if ipres[ip] != nil {
-			//finalresult[server] = ipres[ip]
+		if len(results) > 2 {
+			//Atleast 3 tests worked... find median...
 			finalresult = append(finalresult, Result{
-				Server: server,
-				CI:     ipres[ip],
+				Server: resolver,
+				CI:     medianconinfo(results),
 			})
+
 		}
 	}
 	sort.Sort(finalresult)

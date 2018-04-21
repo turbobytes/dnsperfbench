@@ -294,14 +294,14 @@ func main() {
 		//Render Summary - no raw mode yet
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetAutoWrapText(false)
-		table.SetHeader([]string{"Resolver", "Remote", "Connect", "TLS", "TTFB", "Transfer", "TOTAL"})
+		table.SetHeader([]string{"Resolver", "Remote", "DNS", "Connect", "TLS", "TTFB", "Transfer", "TOTAL"})
 		found := make(map[string]struct{})
 		for _, res := range results {
 			name := resolverNames[res.Server]
 			if name == "" {
 				name = "Unknown"
 			}
-			table.Append([]string{fmt.Sprintf("%s (%s)", res.Server, name), res.CI.Addr, res.CI.Connect.Round(time.Millisecond).String(), res.CI.SSL.Round(time.Millisecond).String(), res.CI.TTFB.Round(time.Millisecond).String(), res.CI.Transfer.Round(time.Millisecond).String(), res.CI.Total.Round(time.Millisecond).String()})
+			table.Append([]string{fmt.Sprintf("%s (%s)", res.Server, name), res.CI.Addr, res.CI.DNS.Round(time.Millisecond).String(), res.CI.Connect.Round(time.Millisecond).String(), res.CI.SSL.Round(time.Millisecond).String(), res.CI.TTFB.Round(time.Millisecond).String(), res.CI.Transfer.Round(time.Millisecond).String(), res.CI.Total.Round(time.Millisecond).String()})
 			//Remove this server from resplver map
 			found[res.Server] = struct{}{}
 		}
@@ -313,7 +313,7 @@ func main() {
 			}
 			_, ok := found[server]
 			if !ok {
-				table.Append([]string{fmt.Sprintf("%s (%s)", server, name), "FAIL", "FAIL", "FAIL", "FAIL", "FAIL", "FAIL"})
+				table.Append([]string{fmt.Sprintf("%s (%s)", server, name), "FAIL", "FAIL", "FAIL", "FAIL", "FAIL", "FAIL", "FAIL"})
 			}
 		}
 		table.Render()

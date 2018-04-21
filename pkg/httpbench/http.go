@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/miekg/dns"
 	"github.com/montanaflynn/stats"
 )
 
@@ -67,21 +66,7 @@ func (ct *conTrack) getConInfo() *ConInfo {
 	return ci
 }
 
-func getFreePort() string {
-	addr, err := net.ResolveUDPAddr("udp", "localhost:0")
-	if err != nil {
-		panic(err)
-	}
-
-	l, err := net.ListenUDP("udp", addr)
-	if err != nil {
-		panic(err)
-	}
-	defer l.Close()
-	return l.LocalAddr().(*net.UDPAddr).String()
-}
-
-func testoverhttp(u *url.URL, ip string) (*ConInfo, error) {
+func testoverhttp(u *url.URL, resolver string) (*ConInfo, error) {
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -90,38 +75,6 @@ func testoverhttp(u *url.URL, ip string) (*ConInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	req = req.WithContext(ctx)
-
-	//Setup our DNS server to send fixed result
-	dnsaddr := getFreePort()
-	serverDNS := &dns.Server{
-		Addr: dnsaddr,
-		Net:  "udp",
-		Handler: dns.HandlerFunc(func(w dns.ResponseWriter, r *dns.Msg) {
-			m := new(dns.Msg)
-			m.SetReply(r)
-			m.Authoritative = true
-			if r.Question[0].Qtype == dns.TypeA {
-				aRec := &dns.A{
-					Hdr: dns.RR_Header{
-						Name:   r.Question[0].Name,
-						Rrtype: dns.TypeA,
-						Class:  dns.ClassINET,
-						Ttl:    10,
-					},
-					A: net.ParseIP(ip),
-				}
-				m.Answer = append(m.Answer, aRec)
-			}
-			w.WriteMsg(m)
-		}),
-	}
-	defer serverDNS.Shutdown()
-	go func() {
-		err := serverDNS.ListenAndServe()
-		if err != nil {
-			panic(err)
-		}
-	}()
 
 	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -133,7 +86,7 @@ func testoverhttp(u *url.URL, ip string) (*ConInfo, error) {
 			Resolver: &net.Resolver{
 				Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 					d := net.Dialer{}
-					return d.DialContext(ctx, "udp", dnsaddr)
+					return d.DialContext(ctx, "udp", resolver+":53")
 				},
 			},
 		}).DialContext,
@@ -199,7 +152,7 @@ func testoverhttp(u *url.URL, ip string) (*ConInfo, error) {
 	//Compute transfer time after consuming body
 	ti.Transfer = time.Since(ct.GotFirstResponseByte)
 	//Recompute Total for our purpose
-	ti.Total = ti.Connect + ti.SSL + ti.TTFB + ti.Transfer
+	ti.Total = ti.DNS + ti.Connect + ti.SSL + ti.TTFB + ti.Transfer
 	return ti, nil
 }
 

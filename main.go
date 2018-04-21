@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net/url"
 	"os"
 	"sort"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/miekg/dns"
 	"github.com/montanaflynn/stats"
 	"github.com/olekukonko/tablewriter"
+	"github.com/turbobytes/dnsperfbench/pkg/httpbench"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -33,6 +35,7 @@ var resolvers arrayFlags
 var (
 	raw              = flag.Bool("r", false, "Output raw mode")
 	version          = flag.Bool("version", false, "Print version and exit")
+	httptest         = flag.String("httptest", "", "Set this to a URL to test HTTP/HTTPS")
 	defaultResolvers = []string{}
 	resolverNames    = map[string]string{
 		"8.8.8.8":                "Google",
@@ -275,6 +278,49 @@ type resultoutput struct {
 }
 
 func main() {
+	if *httptest != "" {
+		//Means we are running http test instead of DNS
+		u, err := url.Parse(*httptest)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if u.Scheme != "http" && u.Scheme != "https" {
+			log.Fatal("Only http:// and https:// schemes supported")
+		}
+		if u.Hostname() == "" {
+			log.Fatal("Invalid URL")
+		}
+		results := httpbench.TestOverHTTP(u, resolvers)
+		//Render Summary - no raw mode yet
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetAutoWrapText(false)
+		table.SetHeader([]string{"Resolver", "Remote", "Connect", "TLS", "TTFB", "Transfer", "TOTAL"})
+		found := make(map[string]struct{})
+		for _, res := range results {
+			name := resolverNames[res.Server]
+			if name == "" {
+				name = "Unknown"
+			}
+			table.Append([]string{fmt.Sprintf("%s (%s)", res.Server, name), res.CI.Addr, res.CI.Connect.Round(time.Millisecond).String(), res.CI.SSL.Round(time.Millisecond).String(), res.CI.TTFB.Round(time.Millisecond).String(), res.CI.Transfer.Round(time.Millisecond).String(), res.CI.Total.Round(time.Millisecond).String()})
+			//Remove this server from resplver map
+			found[res.Server] = struct{}{}
+		}
+		//For everything else stamp a FAIL
+		for _, server := range resolvers {
+			name := resolverNames[server]
+			if name == "" {
+				name = "Unknown"
+			}
+			_, ok := found[server]
+			if !ok {
+				table.Append([]string{fmt.Sprintf("%s (%s)", server, name), "FAIL", "FAIL", "FAIL", "FAIL", "FAIL", "FAIL"})
+			}
+		}
+		table.Render()
+
+		os.Exit(0)
+	}
+
 	resscore := make(map[string]float64)
 	results := make(map[string]recursiveResults)
 	resultschan := make(chan resultoutput, 1)

@@ -105,13 +105,15 @@ To have it permanently available store the binary somewhere permanent.
 ```
 $ dnsperfbench --help
 Usage of dnsperfbench:
-  -queries int
-    	Limit the number of DNS queries in-flight at a time (default 5)
-  -r	Output raw mode
-  -resolver value
-    	Additional resolvers to test. default=8.8.8.8, 114.114.114.114, 180.76.76.76, 8.26.56.26, 208.67.222.222, [2001:4860:4860::8888], [2620:0:ccc::2], 1.1.1.1, 119.29.29.29, 185.228.168.168, [2606:4700:4700::1111], [2620:fe::fe], 9.9.9.9, 199.85.126.20, [2a0d:2a00:1::]
-  -version
-    	Print version and exit
-  -workers int
-    	Number of tests to run at once (default 15)
+-httptest string
+    Set this to a URL to test HTTP/HTTPS
+-queries int
+    Limit the number of DNS queries in-flight at a time (default 5)
+-r	Output raw mode
+-resolver value
+    Additional resolvers to test. default=8.8.8.8, 199.85.126.20, [2001:4860:4860::8888], 1.1.1.1, 114.114.114.114, 180.76.76.76, 208.67.222.222, 119.29.29.29, [2606:4700:4700::1111], 9.9.9.9, 185.228.168.168, 8.26.56.26, [2620:fe::fe], [2620:0:ccc::2], [2a0d:2a00:1::]
+-version
+    Print version and exit
+-workers int
+    Number of tests to run at once (default 15)
 ```
